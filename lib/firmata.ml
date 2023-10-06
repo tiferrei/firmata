@@ -175,13 +175,8 @@ let pinModeInt (mode:pin_mode) : int =
    | UndefinedPin -> 0
 
 (** Converts a list of characters to a string *)
-let implode (l:char list) : string =
-   let res = Bytes.create (List.length l) in
-   let rec imp i = function
-      | [] -> res
-      | c :: l -> Bytes.set res i c; imp (i + 1) l in
-   imp 0 l
-
+let implode (l:char list) : string = l |> List.map (String.make 1) |> String.concat ""
+   
 (** Splits an integer value into its lsb and msb of 7 bits each *)
 let splitLsbMsb (value:int) : int * int =
    let lsb = value land 0x7F in
@@ -239,6 +234,7 @@ let rec parse (data:int list) =
       parse tail
    | _ ->
       [],data
+
 (** Parses sysex messages returned by the board *)
 and parseSysex (data: int list) =
    match data with
@@ -250,7 +246,7 @@ and parseSysex (data: int list) =
          | lsb::msb::rest ->
             let c = joinLsbMsb lsb msb |> char_of_int in
             consume rest (c::acc)
-         | _::rest -> implode (List.rev acc)
+         | _::_ -> implode (List.rev acc)
       in
       let name = consume tail [] in
       FirmwareMsg(vN,vn,name)
@@ -445,12 +441,12 @@ let update (handler:firmata_type) (wait_ms:int) : unit =
          List.iter (fun a -> processResponse handler a) consumed
       end
 
-let openPort (port_name:string) : open_return =
+let openPort (port_name:string) (baud_rate:int) : open_return =
    let port = newSerial() in
    match openSerial port port_name with
    | None ->
       begin
-         setBaudrate port 57600 |> ignore;
+         setBaudrate port baud_rate |> ignore;
          setControl port true false;
          waitSerial port 1 |> ignore;
          readSerial port   |>ignore;

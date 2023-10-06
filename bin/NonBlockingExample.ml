@@ -34,7 +34,7 @@ let updateBoard board state =
 ;;
 
 let main () =
-   match openPort serial_port with
+   match openPort serial_port 115200 with
    | OpenOk(board)   ->
       (* infinite loop *)
       let rec loop state =

@@ -31,8 +31,8 @@ type open_return =
 (** [getSerialPortNames ()] : Returns a list of all the serial ports available in your computer. *)
 val getSerialPortNames : unit -> string list
 
-(** [openPort name] : Opens the serial port [name] which should have attached the board. *)
-val openPort : string -> open_return
+(** [openPort name] : Opens the serial port [name] using [baud_rate] which should have attached the board. *)
+val openPort : string -> int -> open_return
 
 (** [update board ms] : Process all received data. This function receives the value [ms] which
     defines how many milliseconds the board should wait for data before returning. This function

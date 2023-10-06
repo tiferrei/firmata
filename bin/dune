@@ -1,0 +1,4 @@
+(executables
+ (public_names SimpleExample NonBlockingExample)
+ (names SimpleExample NonBlockingExample)
+ (libraries firmata unix))

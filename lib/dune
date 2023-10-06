@@ -1,0 +1,7 @@
+(library
+ (name firmata)
+ (c_library_flags -lstdc++ -framework CoreFoundation -framework IOKit)
+ (foreign_stubs
+  (language cxx)
+  (names firmata_stubs serial)
+  (flags :standard -DMACOSX)))

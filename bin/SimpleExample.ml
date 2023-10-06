@@ -5,7 +5,8 @@
 
 open Firmata
 
-let serial_port = "/dev/ttyACM0" ;;
+let serial_port = "/dev/cu.usbmodemDC5475D154B82" ;;
+let baud_rate = 115200;;
 
 let rec waitTillReady board =
    update board 1;
@@ -13,20 +14,19 @@ let rec waitTillReady board =
 ;;
 
 let main () =
-   match openPort serial_port with
+   match openPort serial_port baud_rate with
    | OpenOk(board)   ->
       waitTillReady    board ;              (* waits for the board to be ready *)
       printInformation board;               (* prints the information of the board *)
       setSamplingRate  board 10 ;           (* sets the sampling rate to 10 ms *)
-      setPinMode       board 21 AnalogPin ; (* configures pin 21 as analog input *)
-      setPinMode       board 4  ServoPin ;  (* configures pin 4 as servo *)
-      reportAnalogPin  board 21 true;       (* request the value of pin 21 to be reported periodically *)
+      setPinMode       board 13 OutputPin ; (* configures pin 13 as digital output *)
       (* infinite loop *)
       let rec loop _ =
          update board 1;                    (* updates the board and waits maximum 1 ms *)
-         let value = analogRead board 21 in (* gets the value of the analog pin (10 bits) *)
-         let angle = value/4 in             (* dives the value by 4 (makes it 8 bits) *)
-         analogWrite board 4 angle;         (* writes it to the servo as angle *)
+         digitalWrite board 13 1;           (* Turns on pin 13 *)
+         Unix.sleep 1;                      (* Waits 1s *)
+         digitalWrite board 13 0;           (* Turns off pin 13 *)
+         Unix.sleep 1;                      (* Waits 1s *)
          loop ()
       in loop ()
    | OpenError(msg) -> print_endline msg
