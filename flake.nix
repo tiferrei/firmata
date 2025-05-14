@@ -34,10 +34,6 @@
           firmata = prev.firmata.overrideAttrs (oa: {
             nativeBuildInputs = oa.nativeBuildInputs
               ++ lib.optionals stdenv.isDarwin [ pkgs.apple-sdk_15 ];
-            #NIX_LDFLAGS = lib.optionals stdenv.isDarwin [
-            #  "-framework" "CoreFoundation"
-            #  "-framework" "IOKit"
-            #];
             NIX_CFLAGS_COMPILE = lib.optionals stdenv.isDarwin [
               "-isysroot" "${pkgs.apple-sdk_15.sdkroot}"
             ];
@@ -52,9 +48,11 @@
         legacyPackages = scope.overrideScope overlay;
         packages.default = self.legacyPackages.${system}.firmata;
         devShells.default = pkgs.mkShell {
-          buildInputs = devPackages ++ [
-            # You can add packages from nixpkgs here
-          ];
+          buildInputs = devPackages
+            ++ lib.optionals stdenv.isDarwin [ pkgs.apple-sdk_15 ];
+          shellHook = if !stdenv.isDarwin then "" else ''
+            export NIX_CFLAGS_COMPILE="-isysroot ${pkgs.apple-sdk_15.sdkroot} ''${NIX_CFLAGS_COMPILE}"
+          '';
         };
       }
     );
