@@ -1,0 +1,32 @@
+on: [push, pull_request]
+name: CI
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    needs: test
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - uses: cachix/install-nix-action@v20
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+
+      name: nix check
+    - run: nix flake check
+
+    - name: nix build
+      run: nix build
+
+    - name: dune build
+      run: nix develop -c dune build
+
+    - name: dune test
+      run: nix develop -c dune test
+
