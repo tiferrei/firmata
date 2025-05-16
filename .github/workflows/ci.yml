@@ -6,7 +6,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    needs: test
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
