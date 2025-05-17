@@ -13,9 +13,9 @@ let () =
       | _ -> flags in
     C.Flags.write_sexp "flags.sexp" flags);
   C.main ~name:"c_library_flags" (fun c ->
-    let flags = [] in
+    let flags = ["-lstdc++"] in
     let flags = match (C.ocaml_config_var c "system") with
-      | Some "macosx" -> flags @ ["-lstdc++"; "-framework"; "CoreFoundation"; "-framework"; "IOKit"]
+      | Some "macosx" -> flags @ ["-framework"; "CoreFoundation"; "-framework"; "IOKit"]
       | _ -> flags in
     C.Flags.write_sexp "c_library_flags.sexp" flags)
 
