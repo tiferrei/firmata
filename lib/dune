@@ -1,8 +1,19 @@
 (library
  (name firmata)
  (public_name firmata)
- (c_library_flags -lstdc++ -framework CoreFoundation -framework IOKit)
+ (c_library_flags (:include c_library_flags.sexp))
  (foreign_stubs
   (language cxx)
   (names firmata_stubs serial)
-  (flags :standard -DMACOSX %{env:NIX_CFLAGS_COMPILE=})))
+  (flags :standard (:include flags.sexp))))
+
+(rule
+ (targets flags.sexp)
+ (deps (:discover ../config/discover.exe))
+ (action (run %{discover})))
+
+(rule
+ (targets c_library_flags.sexp)
+ (deps (:discover ../config/discover.exe))
+ (action (run %{discover})))
+

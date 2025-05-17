@@ -1,6 +1,7 @@
 /*  Serial port object for use with wxWidgets
  *  Copyright 2010, Paul Stoffregen (paul@pjrc.com)
  *  Modified by: Leonardo Laguna Ruiz (modlfo@gmail.co)
+ *  Modified by: Tiago Ferreira (me@tiferrei.com)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,6 +33,7 @@
 #include <termios.h>
 #include <unistd.h>
 #elif defined(MACOSX)
+#include <Availability.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOBSD.h>
 #include <IOKit/IOKitLib.h>
@@ -845,7 +847,18 @@ vector<string> Serial::port_list() {
     mach_port_t masterPort;
     CFMutableDictionaryRef classesToMatch;
     io_iterator_t serialPortIterator;
-    if (IOMainPort(0, &masterPort) != KERN_SUCCESS) return list;
+    #if __MAC_OS_X_VERSION_MIN_REQUIRED >= 120000
+        if (IOMainPort(0, &masterPort) != KERN_SUCCESS) return list;
+    #elif __MAC_OS_X_VERSION_MAX_ALLOWED >= 120000
+        if (__builtin_available(macOS 12.0, *)) {
+            if (IOMainPort(0, &masterPort) != KERN_SUCCESS) return list;
+        } else {
+            if (IOMasterPort(0, &masterPort) != KERN_SUCCESS) return list;
+        }
+    #else
+        if (IOMasterPort(0, &masterPort) != KERN_SUCCESS) return list;
+    #endif
+
     // a usb-serial adaptor is usually considered a "modem",
     // especially when it implements the CDC class spec
     classesToMatch = IOServiceMatching(kIOSerialBSDServiceValue);
