@@ -5,6 +5,8 @@ let () =
     let flags = [] in
     let flags = match (C.ocaml_config_var c "system") with
       | Some "macosx" -> flags @ ["-DMACOSX"]
+      | Some "linux" -> flags @ ["-DLINUX"]
+      | Some "win32" | Some "win64" -> flags @ ["-DWINDOWS"]
       | _ -> flags in
     let flags = match Sys.getenv_opt "NIX_CFLAGS_COMPILE" with
       | Some nix -> flags @ (C.Flags.extract_blank_separated_words nix)
