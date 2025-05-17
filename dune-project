@@ -19,7 +19,7 @@
  (name firmata)
  (synopsis "Library to control Firmata boards like Arduino.")
  (description "Library to control Firmata boards like Arduino.")
- (depends ocaml dune)
+ (depends ocaml dune dune-configurator)
  (tags
   (firmata arduino esp32)))
 
